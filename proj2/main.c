@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-//mode, read, nom fichier
+//fread, nom fichier, scanf du mode
 
 
 int main(int argc, char *argv[])
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 				write(tube[1], &taille, sizeof(taille));
 				write(tube [1],argv[2], sizeof(char));
 				write(tube[1],message, taille*sizeof(char));
-				printf("\nemission: %s", message);
+				//printf("\nemission: %s", message);
 				wait(NULL);
 				
 				//Fermeture fichier + pipe
@@ -64,15 +64,15 @@ int main(int argc, char *argv[])
 			read(tube[0], message, taille*sizeof(char));
 			
 			int nbvoyelle;
-			printf("\nreception : %s", message);
+			//printf("\nreception : %s", message);
 			switch(mode ) //Opperations sur le message
 			{
 				case '1':
 					tableau2= (char*)malloc(taille * sizeof(char));
 					for(int i =0; i< taille; i++)
 					{
-						tableau2[i] = message[taille-i] ;
-						printf("%c", tableau2[i]);
+						tableau2[i] = message[taille-i-1] ;
+						//printf("\n%c", tableau2[i]);
 					}
 					printf("1");
 				break;
@@ -93,9 +93,9 @@ int main(int argc, char *argv[])
 					int j = 0;
 					for(int i =0; i< taille; i++)
 					{
-						if(message[i] != 'a' || message[i] != 'e' || 
-						message[i] != 'i' || message[i] != 'o' || 
-						message[i] != 'u' || message[i] != 'y')
+						if(message[i] != 'a' && message[i] != 'e' && 
+						message[i] != 'i' && message[i] != 'o' &&
+						message[i] != 'u' && message[i] != 'y')
 						{
 							tableau2[j] = message[i];
 							j++;				
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 				fputs(tableau2,f);
 			}*/
 			//fputs("salut",f);
-			printf("\ntransformation : %s", tableau2);
+			//printf("\ntransformation : %s", tableau2);
 			fputs(tableau2,f);
 			//Fermeture fichier et pipe
 			fclose(f);
