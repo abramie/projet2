@@ -8,8 +8,8 @@
 
 int main(int argc, char *argv[])
 {
-	int * message;
-	int * tableau2;
+	char * message;
+	char * tableau2;
 	int pid_fils;
 	int tube[2];
 	long taille=0;
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 				fseek(f,0,SEEK_END);
 				taille = ftell(f);
 				rewind(f);				//Replacement au debut
-				message = (int*)malloc(taille * sizeof(int));
+				message = (char*)malloc(taille * sizeof(char));
 		
 				for(int i =0; i< taille; i++)
 				{
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 				//Envoie des instructions : taille, valeur paramaetre, tableau
 				write(tube[1], &taille, sizeof(taille));
 				write(tube [1],argv[2], sizeof(char));
-				write(tube[1],message, taille*sizeof(int));
+				write(tube[1],message, taille*sizeof(char));
 				wait(NULL);
 				
 				//Fermeture fichier + pipe
@@ -57,18 +57,17 @@ int main(int argc, char *argv[])
 			f = fopen("reception.txt", "w"); //Ouverture / Creation fichier
 			//Receptions des infos
 			read(tube[0],&taille,sizeof(taille));
-			printf("%i", taille);
 			read(tube[0],&mode, sizeof(char));
 			printf("%c", mode);
-			message = (int*)malloc(taille * sizeof(int));
-			read(tube[0], message, taille*sizeof(int));
+			message = (char*)malloc(taille * sizeof(char));
+			read(tube[0], message, taille*sizeof(char));
 			
 			int nbvoyelle;
 			
 			switch(mode ) //Opperations sur le message
 			{
 				case 1:
-				tableau2= (int*)malloc(taille * sizeof(int));
+				tableau2= (char*)malloc(taille * sizeof(char));
 				for(int i =0; i< taille; i++)
 				{
 					tableau2[i] = message[taille-i] ;
@@ -87,7 +86,7 @@ int main(int argc, char *argv[])
 						nbvoyelle ++;			
 					}
 				}
-				tableau2= (int*)malloc((taille-nbvoyelle) * sizeof(int));
+				tableau2= (char*)malloc((taille-nbvoyelle) * sizeof(char));
 				int j = 0;
 				for(int i =0; i< taille; i++)
 				{
