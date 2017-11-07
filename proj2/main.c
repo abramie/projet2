@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
 
 //fread, nom fichier, scanf du mode
 
@@ -14,7 +15,7 @@ int main(int argc, char *argv[])
 	int tube[2];
 	long taille=0;
 	FILE *f;
-	
+	char mode;
 	pipe(tube);
 	pid_fils = fork();
 
@@ -22,6 +23,8 @@ int main(int argc, char *argv[])
 	{
 		if(pid_fils != 0 ) //Pere (Emetteur ) 
 		{
+			printf("Inversion (1) ou suppression des voyelles(2) ? ");
+			scanf("%c", &mode); // Recuperation du mode aupres de l'utilisateur
 			f = fopen(argv[1], "r"); //Ouverture fichier
 			if(f!=NULL)
 			{
@@ -30,17 +33,19 @@ int main(int argc, char *argv[])
 				taille = ftell(f);
 				rewind(f);				//Replacement au debut
 				message = (char*)malloc(taille * sizeof(char));
-		
-				for(int i =0; i< taille; i++)
+				
+				fread(message,  sizeof(char), taille, f);
+				
+				/*for(int i =0; i< taille; i++)
 				{
 					message[i] = fgetc(f);		
-				}
+				}*/
 				
-				//while(fgets(message,taille,f)!= NULL);	
+					
 				//Gestion envoie pipe
 				//Envoie des instructions : taille, valeur paramaetre, tableau
 				write(tube[1], &taille, sizeof(taille));
-				write(tube [1],argv[2], sizeof(char));
+				write(tube [1],&mode, sizeof(char));
 				write(tube[1],message, taille*sizeof(char));
 				//printf("\nemission: %s", message);
 				wait(NULL);
@@ -55,8 +60,8 @@ int main(int argc, char *argv[])
 		}
 		else	  			//Fils (recepteur ) 
 		{
-			char mode;
-			f = fopen("reception.txt", "w"); //Ouverture / Creation fichier
+			
+			f = fopen(strcat(argv[1],".res"), "w"); //Ouverture / Creation fichier
 			//Receptions des infos
 			read(tube[0],&taille,sizeof(taille));
 			read(tube[0],&mode, sizeof(char));
@@ -109,12 +114,14 @@ int main(int argc, char *argv[])
 			
 			//Ecriture du message modifié
 			/*for(int i =0; i< taille; i++)
-			{
+			{ 
 				fputs(tableau2,f);
 			}*/
 			//fputs("salut",f);
 			//printf("\ntransformation : %s", tableau2);
-			fputs(tableau2,f);
+			
+			
+			fwrite(tableau2,sizeof(char), taille,f);
 			//Fermeture fichier et pipe
 			fclose(f);
 			close(tube[0]);		
